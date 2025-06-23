@@ -1,0 +1,23 @@
+{% extends "cartridges/base.html" %}
+
+{% block title %}Статистика{% endblock %}
+
+{% block content %}
+<h2>Сводка по картриджам</h2>
+<div class="card bg-light p-3 mb-3">
+    <div class="d-flex flex-wrap gap-4">
+        <div class="text-center">
+            <h5>Типов картриджей</h5>
+            <p class="fs-3">{{ cartridges|length }}</p>
+        </div>
+        <div class="text-center">
+            <h5>Всего на складе</h5>
+            <p class="fs-3">{{ total_stock }}</p>
+        </div>
+        <div class="text-center text-danger">
+            <h5>Нужно заказать</h5>
+            <p class="fs-3">{{ low_stock_count }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

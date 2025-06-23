@@ -1,0 +1,122 @@
+{% extends "cartridges/base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Таблица картриджей -->
+    <div class="col-md-12">
+        <h2>Картриджи на складе</h2>
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+            <tr>
+                <th>Артикул</th>
+                <th>Наименование</th>
+                <th>Мин. остаток</th>
+                <th>Остаток</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for cartridge in cartridges %}
+            <tr>
+                <td><code>{{ cartridge.article }}</code></td>
+                <td>{{ cartridge.name }}</td>
+                <td>{{ cartridge.min_stock }}</td>
+                <td>{{ cartridge.current_stock }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">Нет данных</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Кнопки операций -->
+    <div class="col-md-12">
+        <h2>Быстрые действия</h2>
+        <div class="btn-group w-100" role="group">
+            <button type="button" class="btn btn-outline-success btn-lg" data-bs-toggle="modal" data-bs-target="#arrivalModal">
+                📥 Приход
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-lg" data-bs-toggle="modal" data-bs-target="#usageModal">
+                📤 Расход
+            </button>
+            <button type="button" class="btn btn-outline-warning btn-lg" data-bs-toggle="modal" data-bs-target="#inventoryModal">
+                🔍 Инвентаризация
+            </button>
+        </div>
+    </div>
+
+    <!-- Модальное окно: Приход -->
+    <div class="modal fade" id="arrivalModal" tabindex="-1" aria-labelledby="arrivalModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="arrivalModalLabel">Добавить приход картриджей</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <!-- Здесь будет форма прихода -->
+                        <p>Выберите картридж и укажите количество.</p>
+                        <button type="submit" class="btn btn-success">Принять</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно: Расход -->
+    <div class="modal fade" id="usageModal" tabindex="-1" aria-labelledby="usageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="usageModalLabel">Добавить расход картриджей</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <!-- Здесь будет форма расхода -->
+                        <p>Выберите принтер, картридж и укажите количество.</p>
+                        <button type="submit" class="btn btn-danger">Списать</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно: Инвентаризация -->
+    <div class="modal fade" id="inventoryModal" tabindex="-1" aria-labelledby="inventoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inventoryModalLabel">Инвентаризация</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <!-- Здесь будет форма инвентаризации -->
+                        <p>Обновите остатки по каждому картриджу.</p>
+                        <button type="submit" class="btn btn-warning">Подтвердить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомление о заказе -->
+    {% with low_stock_count=cartridges|length %}
+    {% if low_stock_count > 0 %}
+    <div class="alert alert-warning mt-3" role="alert">
+        <strong>Внимание!</strong> Нужно заказать {{ low_stock_count }} тип(ов) картриджей.
+        <a href="{% url 'order' %}" class="alert-link">Перейти к заказу</a>
+    </div>
+    {% endif %}
+    {% endwith %}
+</div>
+{% endblock %}
