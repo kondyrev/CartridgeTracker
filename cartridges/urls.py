@@ -12,4 +12,5 @@ urlpatterns = [
     path('stats/', views.stats, name='stats'),
     path('reference/', views.reference, name='reference'),
     path('history/', views.history, name='history'),
+    path('compatibility/add/', views.add_compatibility, name='add_compatibility'),
 ]

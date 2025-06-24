@@ -1,5 +1,5 @@
 from django import forms
-from .models import Department, Printer, Cartridge, CartridgeMinStock, CartridgeInventory, UsageRecord
+from .models import Department, Printer, Cartridge, CartridgeMinStock, CartridgeInventory, UsageRecord, PrinterCartridge
 
 
 class DepartmentForm(forms.ModelForm):
@@ -50,4 +50,14 @@ class CartridgeInventoryForm(forms.ModelForm):
         widgets = {
             'cartridge': forms.Select(attrs={'class': 'form-select'}),
             'current_stock': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
+
+class PrinterCartridgeForm(forms.ModelForm):
+    class Meta:
+        model = PrinterCartridge
+        fields = ['printer', 'cartridge']
+        widgets = {
+            'printer': forms.Select(attrs={'class': 'form-select'}),
+            'cartridge': forms.Select(attrs={'class': 'form-select'}),
         }
