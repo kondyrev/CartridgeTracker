@@ -22,14 +22,10 @@
                 <td><code>{{ cartridge.article }}</code></td>
                 <td>{{ cartridge.name }}</td>
                 <td>
-                    {% with minstock=cartridge.minstock_set.first %}
-                    {{ minstock.min_stock|default:0 }}
-                    {% endwith %}
+                    {{ cartridge.get_min_stock }}
                 </td>
                 <td>
-                    {% with inventory=cartridge.inventory %}
-                    {{ inventory.current_stock|default:0 }}
-                    {% endwith %}
+                    {{ cartridge.get_current_stock }}
                 </td>
             </tr>
             {% empty %}
@@ -59,7 +55,7 @@
 
     <!-- Последние списания -->
     <div class="col-md-12 mt-4">
-        <h2>Последние операции</h2>
+        <h2>Последние списания</h2>
         <table class="table table-bordered table-hover">
             <thead class="table-secondary">
             <tr>
