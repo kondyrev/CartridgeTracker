@@ -61,12 +61,12 @@
         </div>
     </div>
 
-    <!-- Минимальные остатки -->
+    <!-- Блок минимальных остатков -->
     <div class="col-md-6">
         <div class="card mb-4">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Минимальные остатки</h5>
-                <a href="{% url 'set_min_stock' %}" class="btn btn-light btn-sm">⚙️ Установить мин. остаток</a>
+                <a href="{% url 'set_min_stock_global' %}" class="btn btn-light btn-sm">⚙️ Установить мин. остаток</a>
             </div>
             <div class="card-body p-0">
                 {% if min_stocks %}
@@ -74,7 +74,6 @@
                     <thead class="table-dark">
                     <tr>
                         <th>Картридж</th>
-                        <th>Отдел</th>
                         <th>Мин. остаток</th>
                     </tr>
                     </thead>
@@ -82,7 +81,6 @@
                     {% for stock in min_stocks %}
                     <tr>
                         <td>{{ stock.cartridge }}</td>
-                        <td>{{ stock.department }}</td>
                         <td>{{ stock.min_stock }}</td>
                     </tr>
                     {% endfor %}

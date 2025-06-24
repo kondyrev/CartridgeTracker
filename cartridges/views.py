@@ -1,32 +1,42 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Department, Printer, Cartridge, CartridgeMinStock, CartridgeInventory, UsageRecord, PrinterCartridge
-from .forms import DepartmentForm, PrinterForm, CartridgeForm, CartridgeMinStockForm, CartridgeInventoryForm, \
-    PrinterCartridgeForm, ArrivalFormSet
+from .models import Department, Printer, Cartridge, CartridgeMinStockGlobal, CartridgeInventory, UsageRecord, PrinterCartridge
+from .forms import DepartmentForm, PrinterForm, CartridgeForm,  CartridgeInventoryForm, \
+    PrinterCartridgeForm, ArrivalFormSet, CartridgeMinStockGlobalForm
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Cartridge, CartridgeMinStockGlobal, CartridgeInventory
 from django.db.models import prefetch_related_objects
 
 
 @login_required
 def index(request):
     """Главная страница"""
-
-    # Получаем все картриджи
     cartridges = Cartridge.objects.all().order_by('name')
 
-    # Делаем prefetch для связанных моделей
-    prefetch_related_objects(cartridges, 'inventory', 'minstock_set')
+    for cart in cartridges:
+        try:
+            # Получаем текущий остаток
+            inventory = CartridgeInventory.objects.get(cartridge=cart)
+            cart.current_stock = inventory.current_stock
+        except CartridgeInventory.DoesNotExist:
+            cart.current_stock = 0
 
-    # Подсчитываем сводку
+        try:
+            # Получаем минимальный остаток
+            minstock = CartridgeMinStockGlobal.objects.get(cartridge=cart)
+            cart.min_stock = minstock.min_stock
+        except CartridgeMinStockGlobal.DoesNotExist:
+            cart.min_stock = 0
+
+    # Считаем сводку
     low_stock_count = 0
     total_stock = 0
 
     for cart in cartridges:
-        try:
-            if cart.inventory and cart.inventory.current_stock < cart.minstock_set.first().min_stock:
-                low_stock_count += 1
-            total_stock += cart.inventory.current_stock if cart.inventory else 0
-        except (AttributeError, Department.DoesNotExist, CartridgeMinStock.DoesNotExist):
-            pass
+        total_stock += cart.current_stock
+        if cart.current_stock < cart.min_stock:
+            low_stock_count += 1
 
     context = {
         'cartridges': cartridges,
@@ -86,18 +96,18 @@ def add_cartridge(request):
 
 
 @login_required
-def set_min_stock(request):
+def set_min_stock_global(request):
     if request.method == 'POST':
-        form = CartridgeMinStockForm(request.POST)
+        form = CartridgeMinStockGlobalForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('reference')
     else:
-        form = CartridgeMinStockForm()
+        form = CartridgeMinStockGlobalForm()
 
     return render(request, 'cartridges/form.html', {
         'form': form,
-        'title': 'Установить мин. остаток'
+        'title': 'Установить мин. остаток',
     })
 
 
@@ -122,9 +132,12 @@ def reference(request):
     departments = Department.objects.all()
     printers = Printer.objects.select_related('department').all()
     cartridges = Cartridge.objects.all()
-    min_stocks = CartridgeMinStock.objects.select_related('cartridge', 'department').all()
+
+    # Минимальные остатки (глобальные)
+    min_stocks = CartridgeMinStockGlobal.objects.select_related('cartridge').all()
+
+    # Текущие остатки
     current_stocks = CartridgeInventory.objects.select_related('cartridge').all()
-    compatibility_list = PrinterCartridge.objects.select_related('printer', 'cartridge').all()
 
     context = {
         'departments': departments,
@@ -132,7 +145,6 @@ def reference(request):
         'cartridges': cartridges,
         'min_stocks': min_stocks,
         'current_stocks': current_stocks,
-        'compatibility_list': compatibility_list,
     }
 
     return render(request, 'cartridges/reference.html', context)

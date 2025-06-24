@@ -37,18 +37,17 @@ class Cartridge(models.Model):
         if minstock and minstock.exists():
             return minstock.first().min_stock
         return 0
-class CartridgeMinStock(models.Model):
-    """Минимальный остаток по отделам"""
-    cartridge = models.ForeignKey(
+class CartridgeMinStockGlobal(models.Model):
+    """Минимальный остаток (глобальный)"""
+    cartridge = models.OneToOneField(
         Cartridge,
         on_delete=models.CASCADE,
-        related_name='minstock_set'
+        related_name='minstock'  # Теперь доступен как cartridge.minstock
     )
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
     min_stock = models.PositiveIntegerField("Минимальный остаток")
 
     def __str__(self):
-        return f"{self.cartridge} → {self.department}: {self.min_stock}"
+        return f"{self.cartridge}: {self.min_stock} шт."
 
 class CartridgeInventory(models.Model):
     """Текущий остаток на складе"""

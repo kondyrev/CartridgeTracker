@@ -21,16 +21,8 @@
             <tr>
                 <td><code>{{ cartridge.article }}</code></td>
                 <td>{{ cartridge.name }}</td>
-                <td>
-                    {{ cartridge.get_min_stock }}
-                </td>
-                <td>
-                    {{ cartridge.get_current_stock }}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" class="text-center">Нет данных</td>
+                <td>{{ cartridge.min_stock|default:0 }}</td>
+                <td>{{ cartridge.current_stock|default:0 }}</td>
             </tr>
             {% endfor %}
             </tbody>
