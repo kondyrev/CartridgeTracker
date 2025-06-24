@@ -134,7 +134,7 @@
             <a href="{% url 'add_compatibility' %}" class="btn btn-light btn-sm">➕ Добавить совместимость</a>
         </div>
         <div class="card-body p-0">
-            {% if compatibility_list %}
+            {% if compatibilities %}
             <table class="table table-striped table-hover mb-0">
                 <thead class="table-dark">
                 <tr>
@@ -143,10 +143,10 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for link in compatibility_list %}
+                {% for compatibility in compatibilities %}
                 <tr>
-                    <td>{{ link.printer }}</td>
-                    <td>{{ link.cartridge }}</td>
+                    <td>{{ compatibility.printer }}</td>
+                    <td>{{ compatibility.cartridge }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>

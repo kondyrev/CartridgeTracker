@@ -139,12 +139,16 @@ def reference(request):
     # Текущие остатки
     current_stocks = CartridgeInventory.objects.select_related('cartridge').all()
 
+    # Добавляем подгрузку совместимостей
+    compatibilities = PrinterCartridge.objects.select_related('printer', 'cartridge').all()
+
     context = {
         'departments': departments,
         'printers': printers,
         'cartridges': cartridges,
         'min_stocks': min_stocks,
         'current_stocks': current_stocks,
+        'compatibilities': compatibilities,
     }
 
     return render(request, 'cartridges/reference.html', context)
