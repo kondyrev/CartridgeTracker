@@ -1,0 +1,58 @@
+{% extends "cartridges/base.html" %}
+
+{% block title %}Добавить приход{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>Картридж</th>
+            <th>Количество</th>
+            <th>Удалить</th>
+        </tr>
+        </thead>
+        <tbody id="arrival-formset">
+        {% for form in formset %}
+        <tr>
+            <td>{{ form.cartridge }}</td>
+            <td>{{ form.quantity }}</td>
+            <td>{% if formset.can_delete %}{{ form.DELETE }}{% endif %}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-success">Сохранить приход</button>
+    <a href="{% url 'index' %}" class="btn btn-secondary">Отмена</a>
+</form>
+
+<!-- Кнопка добавления новой строки -->
+<button id="add-more" class="btn btn-outline-primary mt-3">➕ Добавить ещё</button>
+
+<!-- JS для динамического добавления строк -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    $(document).ready(function() {
+        let totalForms = $('#id_form-TOTAL_FORMS');
+        let formTemplate = $('#arrival-formset tr:first').clone();
+        let formCount = parseInt(totalForms.val());
+
+        $('#add-more').click(function(e) {
+            e.preventDefault();
+            let newForm = formTemplate.clone();
+            newForm.find('input, select').each(function() {
+                $(this).attr('name', $(this).attr('name').replace('__prefix__', formCount));
+                $(this).attr('id', $(this).attr('id').replace('__prefix__', formCount));
+            });
+            newForm.find(':input').val('');
+            $('#arrival-formset').append(newForm);
+            totalForms.val(formCount + 1);
+            formCount++;
+        });
+    });
+</script>
+{% endblock %}

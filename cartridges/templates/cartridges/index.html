@@ -21,8 +21,16 @@
             <tr>
                 <td><code>{{ cartridge.article }}</code></td>
                 <td>{{ cartridge.name }}</td>
-                <td>{{ cartridge.min_stock }}</td>
-                <td>{{ cartridge.current_stock }}</td>
+                <td>
+                    {% with minstock=cartridge.minstock_set.first %}
+                    {{ minstock.min_stock|default:0 }}
+                    {% endwith %}
+                </td>
+                <td>
+                    {% with inventory=cartridge.inventory %}
+                    {{ inventory.current_stock|default:0 }}
+                    {% endwith %}
+                </td>
             </tr>
             {% empty %}
             <tr>
@@ -33,90 +41,59 @@
         </table>
     </div>
 
-    <!-- Кнопки операций -->
+    <!-- Кнопки действий -->
     <div class="col-md-12">
         <h2>Быстрые действия</h2>
         <div class="btn-group w-100" role="group">
-            <button type="button" class="btn btn-outline-success btn-lg" data-bs-toggle="modal" data-bs-target="#arrivalModal">
+            <a href="{% url 'add_arrival' %}" class="btn btn-outline-success btn-lg">
                 📥 Приход
-            </button>
-            <button type="button" class="btn btn-outline-danger btn-lg" data-bs-toggle="modal" data-bs-target="#usageModal">
+            </a>
+            <a href="#" class="btn btn-outline-danger btn-lg disabled">
                 📤 Расход
-            </button>
-            <button type="button" class="btn btn-outline-warning btn-lg" data-bs-toggle="modal" data-bs-target="#inventoryModal">
+            </a>
+            <a href="#" class="btn btn-outline-warning btn-lg disabled">
                 🔍 Инвентаризация
-            </button>
+            </a>
         </div>
     </div>
 
-    <!-- Модальное окно: Приход -->
-    <div class="modal fade" id="arrivalModal" tabindex="-1" aria-labelledby="arrivalModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="arrivalModalLabel">Добавить приход картриджей</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <!-- Здесь будет форма прихода -->
-                        <p>Выберите картридж и укажите количество.</p>
-                        <button type="submit" class="btn btn-success">Принять</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно: Расход -->
-    <div class="modal fade" id="usageModal" tabindex="-1" aria-labelledby="usageModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="usageModalLabel">Добавить расход картриджей</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <!-- Здесь будет форма расхода -->
-                        <p>Выберите принтер, картридж и укажите количество.</p>
-                        <button type="submit" class="btn btn-danger">Списать</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно: Инвентаризация -->
-    <div class="modal fade" id="inventoryModal" tabindex="-1" aria-labelledby="inventoryModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="inventoryModalLabel">Инвентаризация</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <!-- Здесь будет форма инвентаризации -->
-                        <p>Обновите остатки по каждому картриджу.</p>
-                        <button type="submit" class="btn btn-warning">Подтвердить</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+    <!-- Последние списания -->
+    <div class="col-md-12 mt-4">
+        <h2>Последние операции</h2>
+        <table class="table table-bordered table-hover">
+            <thead class="table-secondary">
+            <tr>
+                <th>Дата</th>
+                <th>Картридж</th>
+                <th>Принтер</th>
+                <th>Отдел</th>
+                <th>Кол-во</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record.date_used|date:"d.m.Y" }}</td>
+                <td>{{ record.cartridge }}</td>
+                <td>{{ record.printer.name }}</td>
+                <td>{{ record.printer.department }}</td>
+                <td class="text-center">{{ record.quantity }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted">Нет записей</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 
     <!-- Уведомление о заказе -->
-    {% with low_stock_count=cartridges|length %}
     {% if low_stock_count > 0 %}
     <div class="alert alert-warning mt-3" role="alert">
         <strong>Внимание!</strong> Нужно заказать {{ low_stock_count }} тип(ов) картриджей.
-        <a href="{% url 'order' %}" class="alert-link">Перейти к заказу</a>
+        <a href="{% url 'reference' %}" class="alert-link">Перейти к заказу</a>
     </div>
     {% endif %}
-    {% endwith %}
 </div>
 {% endblock %}

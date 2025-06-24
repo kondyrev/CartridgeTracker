@@ -61,3 +61,11 @@ class PrinterCartridgeForm(forms.ModelForm):
             'printer': forms.Select(attrs={'class': 'form-select'}),
             'cartridge': forms.Select(attrs={'class': 'form-select'}),
         }
+
+
+class ArrivalForm(forms.Form):
+    cartridge = forms.ModelChoiceField(queryset=Cartridge.objects.all(), label="Картридж", widget=forms.Select(attrs={'class': 'form-select'}))
+    quantity = forms.IntegerField(label="Количество", min_value=1, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+
+# Формсет — позволяет добавлять несколько картриджей
+ArrivalFormSet = forms.formset_factory(ArrivalForm, extra=1, can_delete=True)

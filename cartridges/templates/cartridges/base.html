@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Учет картриджей{% endblock %}</title>
-
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"  rel="stylesheet">
     <!-- Темная тема от Bootswatch -->
@@ -13,11 +12,9 @@
         body {
             padding-top: 60px;
         }
-
         .navbar {
             margin-bottom: 20px;
         }
-
         .sidebar {
             position: fixed;
             top: 60px;
@@ -27,37 +24,26 @@
             background-color: #2c3e50;
             color: white;
             overflow-y: auto;
-            z-index: 1000;
         }
-
         .content {
-            margin-left: 0;
-            padding-right: 20px;
+            margin-left: 250px;
         }
-
-        @media (min-width: 768px) {
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
             .content {
-                margin-left: 250px;
+                margin-left: 0;
             }
-            .navbar {
-                display: none; /* Скрываем верхнее меню на десктопе */
-            }
-        }
-
-        /* Активный пункт меню */
-        .nav-link.active,
-        .list-group-item.active {
-            background-color: #3498db !important;
-            color: white !important;
         }
     </style>
 </head>
 <body>
 
 <!-- Навигационное меню (бургер для мобильных) -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top d-md-none">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'index' %}">Учет картриджей</a>
+        <a class="navbar-brand" href="#">Учет картриджей</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -65,54 +51,46 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}"
-                       href="{% url 'index' %}">Главная</a>
+                    <a class="nav-link" href="{% url 'reference' %}">Справочники</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'order' %}active{% endif %}"
-                       href="{% url 'order' %}">Заказ</a>
+                    <a class="nav-link" href="{% url 'order' %}">Заказ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'stats' %}active{% endif %}"
-                       href="{% url 'stats' %}">Статистика</a>
+                    <a class="nav-link" href="#">Статистика</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'reference' %}active{% endif %}"
-                       href="{% url 'reference' %}">Справочники</a>
+                    <a class="nav-link" href="#">История</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'history' %}active{% endif %}"
-                       href="{% url 'history' %}">История</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Выход</a>
+                    <a class="nav-link" href="#">Выход</a>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
 
-<!-- Боковое меню слева -->
+<!-- Боковое меню слева (только десктоп) -->
 <div class="d-none d-md-block sidebar">
     <h5 class="text-center mb-4">Меню</h5>
     <ul class="list-group list-group-flush">
-        <li class="list-group-item {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
-            <a href="{% url 'index' %}" style="color: inherit; text-decoration: none;">🏠 Главная</a>
-        </li>
-        <li class="list-group-item {% if request.resolver_match.url_name == 'order' %}active{% endif %}">
-            <a href="{% url 'order' %}" style="color: inherit; text-decoration: none;">🛒 Заказ</a>
-        </li>
-        <li class="list-group-item {% if request.resolver_match.url_name == 'stats' %}active{% endif %}">
-            <a href="{% url 'stats' %}" style="color: inherit; text-decoration: none;">📊 Статистика</a>
-        </li>
-        <li class="list-group-item {% if request.resolver_match.url_name == 'reference' %}active{% endif %}">
-            <a href="{% url 'reference' %}" style="color: inherit; text-decoration: none;">📚 Справочники</a>
-        </li>
-        <li class="list-group-item {% if request.resolver_match.url_name == 'history' %}active{% endif %}">
-            <a href="{% url 'history' %}" style="color: inherit; text-decoration: none;">📜 История</a>
+        <li class="list-group-item">
+            <a href="{% url 'index' %}">🏠 Главная</a>
         </li>
         <li class="list-group-item">
-            <a href="{% url 'logout' %}" style="color: inherit; text-decoration: none;">🚪 Выход</a>
+            <a href="{% url 'reference' %}">📚 Справочники</a>
+        </li>
+        <li class="list-group-item">
+            <a href="{% url 'order' %}">🛒 Заказ</a>
+        </li>
+        <li class="list-group-item">
+            <a href="{% url 'stats' %}">📊 Статистика</a>
+        </li>
+        <li class="list-group-item">
+            <a href="#">📜 История</a>
+        </li>
+        <li class="list-group-item">
+            <a href="#">🚪 Выход</a>
         </li>
     </ul>
 </div>
