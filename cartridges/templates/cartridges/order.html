@@ -3,6 +3,119 @@
 {% block title %}Формирование заказа{% endblock %}
 
 {% block content %}
-<h2>Формирование заказа</h2>
-<p>На этой странице будет формироваться заказ на картриджи.</p>
+<h1>{{ title }}</h1>
+
+<!-- Блок автоматического заказа -->
+{% if order_items %}
+<div class="card mb-4">
+    <div class="card-header bg-warning text-white">Нужно заказать</div>
+    <table class="table table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>Артикул</th>
+            <th>Наименование</th>
+            <th>Текущий остаток</th>
+            <th>Минимальный остаток</th>
+            <th>Нужно заказать</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in order_items %}
+        <tr>
+            <td>{{ item.cartridge.article }}</td>
+            <td>{{ item.cartridge.name }}</td>
+            <td>{{ item.current }}</td>
+            <td>{{ item.minimum }}</td>
+            <td>{{ item.needed }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted">Нет данных для заказа</p>
+{% endif %}
+
+<!-- Форма ручного добавления -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">Добавить в заказ вручную</div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            <table class="table table-bordered" id="formset-table">
+                <thead>
+                <tr>
+                    <th>Картридж</th>
+                    <th>Количество</th>
+                    <th>Удалить</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for form in formset %}
+                <tr>
+                    <td>
+                        {{ form.cartridge }}
+                        {{ form.cartridge.errors }}
+                    </td>
+                    <td>
+                        {{ form.quantity }}
+                        {{ form.quantity.errors }}
+                    </td>
+                    <td>
+                        {% if formset.can_delete %}
+                        {{ form.DELETE }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-success">Сохранить</button>
+            <a href="{% url 'index' %}" class="btn btn-secondary">Назад</a>
+        </form>
+
+        <!-- Кнопка добавления -->
+        <button id="add-more" class="btn btn-outline-primary mt-3">➕ Добавить ещё</button>
+    </div>
+</div>
+
+<!-- Экспорт и отправка -->
+<div class="d-flex gap-2">
+    <a href="{% url 'export_order_to_excel' %}" class="btn btn-success">📥 Выгрузить в Excel</a>
+    <a href="{% url 'send_order_email' %}" class="btn btn-primary">📧 Отправить на почту</a>
+</div>
+
+<!-- Шаблон строки -->
+<script type="text/template" id="empty-row">
+    <tr>
+        <td>
+            <select name="{{ formset.prefix }}-__prefix__-cartridge" class="form-select">
+                {% for cart in cartridges %}
+                <option value="{{ cart.id }}">{{ cart.name }} ({{ cart.article }})</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td>
+            <input type="number" name="{{ formset.prefix }}-__prefix__-quantity" class="form-control" min="1">
+        </td>
+        <td>
+            <input type="checkbox" name="{{ formset.prefix }}-__prefix__-DELETE" class="form-check-input">
+        </td>
+    </tr>
+</script>
+
+<!-- JS для динамического добавления строк -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let formCount = {{ formset.total_form_count }};
+        $('#add-more').click(function () {
+            const row = $('#empty-row').html()
+                .replace(/__prefix__/g, formCount);
+            $('#formset-table tbody').append(row);
+            formCount++;
+        });
+    });
+</script>
 {% endblock %}

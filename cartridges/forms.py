@@ -68,3 +68,9 @@ class ArrivalForm(forms.Form):
 
 # Формсет — позволяет добавлять несколько картриджей
 ArrivalFormSet = forms.formset_factory(ArrivalForm, extra=1, can_delete=True)
+
+class OrderForm(forms.Form):
+    cartridge = forms.ModelChoiceField(queryset=Cartridge.objects.all(), label="Картридж", widget=forms.Select(attrs={'class': 'form-select'}))
+    quantity = forms.IntegerField(label="Количество", min_value=1, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+
+OrderFormSet = forms.formset_factory(OrderForm, extra=1, can_delete=True)
