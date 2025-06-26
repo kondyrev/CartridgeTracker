@@ -252,6 +252,7 @@ def order(request):
 
     return render(request, 'cartridges/order.html', {
         'order_items': order_items,
+        'cartridges': cartridges,
         'formset': formset,
         'title': 'Формирование заказа'
     })

@@ -54,19 +54,9 @@
                 <tbody>
                 {% for form in formset %}
                 <tr>
-                    <td>
-                        {{ form.cartridge }}
-                        {{ form.cartridge.errors }}
-                    </td>
-                    <td>
-                        {{ form.quantity }}
-                        {{ form.quantity.errors }}
-                    </td>
-                    <td>
-                        {% if formset.can_delete %}
-                        {{ form.DELETE }}
-                        {% endif %}
-                    </td>
+                    <td>{{ form.cartridge }}</td>
+                    <td>{{ form.quantity }}</td>
+                    <td>{% if formset.can_delete %}{{ form.DELETE }}{% endif %}</td>
                 </tr>
                 {% endfor %}
                 </tbody>
@@ -86,7 +76,7 @@
     <a href="{% url 'send_order_email' %}" class="btn btn-primary">📧 Отправить на почту</a>
 </div>
 
-<!-- Шаблон строки -->
+<!-- Шаблон строки для JS -->
 <script type="text/template" id="empty-row">
     <tr>
         <td>
@@ -105,15 +95,16 @@
     </tr>
 </script>
 
-<!-- JS для динамического добавления строк -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- JS — полностью скопирован из работающего `arrival.html` -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js "></script>
 <script>
     $(document).ready(function () {
         let formCount = {{ formset.total_form_count }};
-        $('#add-more').click(function () {
-            const row = $('#empty-row').html()
-                .replace(/__prefix__/g, formCount);
-            $('#formset-table tbody').append(row);
+        const formTemplate = $('#empty-row').html();
+
+        $('#add-more').on('click', function () {
+            const newRow = formTemplate.replace(/__prefix__/g, formCount);
+            $('#formset-table tbody').append(newRow);
             formCount++;
         });
     });
